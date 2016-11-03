@@ -86,10 +86,13 @@ class GenericDaemon(object):
                 except IOError, e:
                         pid = None
        
-                if pid:
-                        message = "pidfile %s already exist. Daemon already running?\n"
+                if pid and os.path.exists("/proc/{}".format(pid)):
+                        message = "Daemon already running!\n"
                         sys.stderr.write(message % self.pidfile)
                         sys.exit(1)
+                else:
+                        self.log.warn("Doesn't look like the process shutdown clean. Cleaning up...")
+                        os.remove(self.pidfile)
                
                 # Start the daemon
                 self.daemonize()
